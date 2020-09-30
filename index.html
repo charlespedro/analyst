@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <title>Charles Pedro</title>
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+    
+  <link rel="stylesheet" href="style.css">    
+
+</head>
+<body>
+<div class='header section'>
+  <div class='container'>
+    <h1 id="top">Charles Pedro, Technical Data Analyst</h1>
+    <p>This is a portfolio that highlights some work I've done. It's in progress - more to come.</p>
+
+     
+  </div>
+</div>
+<!--   <p></p>   -->
+<div class='main section'>
+  <div class='container'>
+
+	<h2>Introduction</h2>
+	<p>Most of the projects I have worked are company-related and therefore proprietary. But here's a sample of awesome things I made.</p>
+
+	<h2>Code examples</h2>
+
+
+	<a href="#sql">SQL</a><br>
+	<a href="#python_aws">Python and boto3 - interacting with AWS S3</a><br>
+	<a href="#python_wb">Python, Pandas, and web development</a><br>
+	<a href="#data_viz">Data Vis</a>	
+
+	<h2 id="sql">SQL</h2>
+	
+	<p>This is a simple but real world example and can apply to tables of any size. This is a brief exercise that features food in a supermarket's storage. </p>
+
+	<p> <b>Objective</b>: Some of our food is old. We need to find the most recent foods so we can throw out the rest.<br><br>	
+	- Within each category, sort and find the most recent two foods by date.<br>
+	- if there's a tie on date, keep the one with a higher rating.<br>
+	- if there's a tie on rating, take the lower priced one.<br>
+	</p>
+	<br>
+	<p>Here's the inventory table. Note that we have some ties for date within fruits and veggies. How can we keep the ones highlighted in orange and ignore the gray?</p>
+	<img src="foods_full.png">
+	<br><br>
+	<p>The rank function can help us do that. I'll first show the table with the rank column so we can confirm the logic. For example with veggies, we get the most recent date and where there's a tie for second, we get the higher rated vegetable, which is broccoli. This is a DBeaver window, FYI.</p> 
+	<br>
+	<img src="rank_one.png">	
+	<br><br><br>
+	<p>Now all we need to do is find where the rank value is 1 or 2. Most people would do this, a simple nested query:</p> 
+	<br><br>
+	<img src="sql_nested.png">	
+	<br><br><br>
+	<p>That works but I also like the common table expression (CTE). For longer queries, I find them more manageable. </p>
+	<br><br>
+	<img src="sql_cte.png">		
+	<br><br>
+	<p>Indeed, we get the bananas and broccoli as expected. Where those rows tied on date, we got the one with the higher rating.</p>
+	<br>
+	
+	
+	
+	<!-- <h2>Python - getting data from a data warehouse</h2>	 -->
+	
+	
+	
+
+	<h2 id="python_aws">Python and boto3 - interacting with AWS S3</h2>		
+	
+	<h3>Counting objects in S3</h3>
+	<p>Let's say we have many objects in S3 and need to count how many there are based on the file extension. Here I test a script using this bucket as shown in the AWS Console:</p>
+	<br>
+	<img src="bucket_all.png">
+	<br><br>
+	<p>You could do the same with the AWS CLI command:</p>
+	<p class="code">$ aws s3 ls s3://test/<br>
+	<span class="tab_4">PRE empty_folder/<br>
+	2020-02-04 20:50:10    5759690 MovieSimilarities1M.jar<br>
+	2020-09-29 18:56:28        130 countries.txt<br>
+	2019-07-23 17:24:28         55 fruits.csv<br>
+	2020-09-29 18:49:35        153 music.csv<br>
+	</p>
+	<p></p>	
+	<br>
+	<p>This is all we need to get started. Import libraries, define the bucket name, and then see what's there.</p>		
+	<br>
+	<p class="code">import boto3<br>
+	import re<br>
+	<br>
+	s3 = boto3.resource('s3')<br>
+	bucket = s3.Bucket('test')<br>
+	cnt = 0<br>
+	ext_dict = {}<br>
+	size = 0<br>
+	<br>
+	for file in bucket.objects.all():<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;print(file)</p>	
+	<br>
+	<p>I'm editing in vim from an EMR cluster. I've been using vim for so long it's quite easy. Run the script:</p>
+	<br>
+	<p class="code">$ ./count_bucket_items.py<br>
+	s3.ObjectSummary(bucket_name='test', key='MovieSimilarities1M.jar')<br>
+	s3.ObjectSummary(bucket_name='test', key='countries.txt')<br>
+	s3.ObjectSummary(bucket_name='test', key='empty_folder/')<br>
+	s3.ObjectSummary(bucket_name='test', key='fruits.csv')<br>
+	s3.ObjectSummary(bucket_name='test', key='music.csv')</p>
+	<br>
+	<p>This is a good start but note that it prints the folder, which we want to ignore. S3 doesn't have the concept of folders - it's just another object, in the same way that they don't have "files" either. It's all objects. Anyway we only want to consider actual "files".</p>
+	<br>
+	<br>
+	<p class="code">for file in bucket.objects.all():<br>
+	<span class="tab_1">if not re.search("/$", file.key):     <br>
+	<span class="tab_2">if re.match(".*\.[a-z]+$", file.key): <br>
+	<span class="tab_3">ext = file.key.split('.')             <br>
+	<span class="tab_3">if ext[-1] in ext_dict.keys():        <br>
+	<span class="tab_4">ext_dict[ext[-1]] += 1<br>
+	<span class="tab_3">else:<br>
+	<span class="tab_4">ext_dict[ext[-1]] = 1<br>
+	<span class="tab_2">else:<br>
+	<span class="tab_3">print("Something didn't match here\n")<br>
+	<span class="tab_2">cnt += 1<br>
+	<span class="tab_2">size += file.size<br>
+	<br>
+	print("found", cnt, "objects\n")<br>
+	<br>
+	print("extensions found:")<br>
+	for x in ext_dict.keys():<br>
+	<span class="tab_1">print(x)<br>
+	<br>
+	print("\ncounts by extension:\n")<br>
+	<br>
+	for i,j in ext_dict.items():                        # print the extension and number of objects<br>
+	<span class="tab_1">print(i,j)<br>
+	<br>
+	print("\ntotal size of bucket:", round(size/1000000), "Mb")<br>
+	<br>
+	print("\nFinished extension count")
+	</p>
+	<br>
+	<br>
+	<p>Now I run it and get some nice output, as expected based on what is actually in the bucket. This can work in production with hundreds or thousands of objects.</p>
+	<br>
+	<p class="code">$ ./count_bucket_items.py<br>
+	Start extension count...<br>
+	<br>
+	found 4 objects<br>
+	<br>
+	extensions found:<br>
+	csv<br>
+	txt<br>
+	jar<br>
+	<br>
+	counts by extension:<br>
+	<br>
+	csv 2<br>
+	txt 1<br>
+	jar 1<br>
+	<br>
+	total size of bucket: 6 Mb<br>
+	<br>
+	Finished extension count</p>
+	<br>
+	
+
+	<h2 id="python_wb">Python, Pandas, and web development</h2>
+	<h3>Exploring the World Bank API and development indicators</h3>	
+	
+	<p>How effective is aid? Much has been written about the economic failures of Latin America in the 1970s and in Africa throughout the 1980s and 90s. Despite massive amounts of aid, many countries failed to achieve economic growth or quality of life improvements.</p>
+
+	<p>This project tries to measure the effectiveness of aid by looking at how much countries have received compared to a few development indicators.</p>	
+	
+	<p><a href="http://damp-waters-3821.herokuapp.com/">The Effectiveness of Foreign Aid</a></p>      		
+	
+	<p class='bold_text section'>Jupyter Notebook and Pandas Update</p>
+	  
+	<p>The above website is still up but the Python code doesn't work because the World Bank changed their API. I just re-wrote the code using Jupyter Notebook and Pandas, which I had not yet known about back in 2015! </p>
+
+	<p><a href="https://github.com/charlespedro/worldbank/blob/master/world_bank.ipynb">Jupyter Notebook dataframe - calculations and aggregation</a></p> 
+	
+	<br>
+	<h2 id="data_viz">Data Visualization</h2>
+	<h3>Data Visualization final project</h3>
+	<p>These are various visualizations creating using R, High Charts, Google Charts, and Tableau. The topics include health, education, economy, demographics, and other social indicators.</p>
+
+	<p><a href="http://charlespedro.github.io/data-viz-1-final/">Data Visualization Final Project</a></p>      
+	
+	<h3>Advanced Data Visualization final project</h3>	
+	<p>Created with JavaScript and D3, this project explores US imports and exports by comparing the trade of goods and services.</p>	
+	<p><a href="http://charlespedro.github.io/data-viz-2-final/">Advanced Data Visualization Final Project</a></p>  	
+	
+	<br>
+	<br>
+	<a href="#top">Back to top</a><br>
+	<br>
+	<br>
+  </div>
+</div>    
+   
+    
+</body>
+</html> 
