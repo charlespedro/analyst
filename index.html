@@ -44,11 +44,11 @@
 	</p>
 	<br>
 	<p>Here's the inventory table. Note that we have some ties for date within fruits and veggies. How can we keep the ones highlighted in orange and ignore the gray?</p>
-	<img src="foods_full.png">
+	<img src="foods_full.PNG">
 	<br><br>
 	<p>The rank function can help us do that. I'll first show the table with the rank column so we can confirm the logic. For example with veggies, we get the most recent date and where there's a tie for second, we get the higher rated vegetable, which is broccoli. This is a DBeaver window, FYI.</p> 
 	<br>
-	<img src="rank_one.png">	
+	<img src="rank_one.PNG">	
 	<br><br><br>
 	<p>Now all we need to do is find where the rank value is 1 or 2. Most people would do this, a simple nested query:</p> 
 	<br><br>
