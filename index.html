@@ -42,7 +42,7 @@
 	
 	
 	<h3 id="sql_rank">Ranking items with a window function</h3>	
-	<p>This is a simple but practical example that can apply to tables of any size. Let's say we have food in a supermarket's inventory.</p>
+	<p>This is a simple but practical example that can apply to tables of any reasonable size (I haven't tried on a table with a billion rows using Hive). Let's say we have food in a supermarket's inventory. I'm using DBeaver to access the table in AWS Redshift, FYI.</p>
 
 	<p>Some of the food is old. We need to find the most recent foods so we can throw out the rest.</p>
 	<ul>
@@ -56,11 +56,11 @@
 	<br>
 	<img src="foods_table.PNG" alt="no image found!">
 	<br><br>
-	<p>The rank function can help us do that. I'll first show the table with the rank column so we can confirm the logic. For example with veggies, we get the most recent date and where there's a tie for second, we get the higher rated vegetable, which is broccoli. This is a DBeaver window, FYI.</p> 
+	<p>The rank function can help us do that. I'll first show the table with the rank column so we can confirm the logic. For example with veggies, we get the most recent date and where there's a tie for second, we get the higher rated vegetable, which is broccoli.</p> 
 	<br>
 	<img src="rank_one.PNG">	
 	<br><br><br>
-	<p>Now all we need to do is find where the rank value is 1 or 2. Most people would do this, a simple nested query:</p> 
+	<p>Now all we need to do is find where the rank value is 1 or 2. Most people would do a nested query like this:</p> 
 	<br><br>
 	<img src="sql_nested.PNG">	
 	<br><br><br>
@@ -146,7 +146,7 @@
 	<br>
 	<p>This is a good start but note that it prints the folder, which we want to ignore. S3 doesn't have the concept of folders - it's just another object, in the same way that cloud platforms like AWS and Azure don't have "files" either. It's all objects. Anyway we only want to consider actual "files".</p>
 	<br>
-	<p>The script iterates through the returned list and does the following:</p>
+	<p>This script will iterate through the returned list and do the following:</p>
 	<ul>
 	<li>ignore any value that ends with a slash / (indicates a folder)</li>
 	<li>look for anything with a pattern that has a dot, as in "file.ext", and the extention must have alphabetic characters</li>
@@ -187,7 +187,7 @@
 	</p>
 	<br>
 	<br>
-	<p>Now I run it and get some nice output, as expected based on what is actually in the bucket. This can work in production with hundreds or thousands of objects.</p>
+	<p>Now I run it and get the expected output based on the bucket contents. This can work in production with hundreds or thousands of objects.</p>
 	<br>
 	<p class="code">$ ./count_bucket_items.py<br>
 	Start extension count...<br>
