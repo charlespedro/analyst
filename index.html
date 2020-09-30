@@ -29,12 +29,17 @@
 
 	<a href="#sql">SQL</a><br>
 	<span class="tab_1"><a href="#sql_rank">Ranking items with a window function</a><br>	
+	<span class="tab_1"><a href="#sql_sum">Basic Aggregation</a><br>		
 	<a href="#python">Python</a><br>
 	<span class="tab_1"><a href="#python_aws_count">Counting objects in AWS S3</a><br>
 	<span class="tab_1"><a href="#python_wb">Pandas and web development project</a><br>
 	<a href="#data_viz">Data Vis</a>	
 
 	<h2 id="sql">SQL</h2>
+	
+	
+	<!-- RANK WINDOW FUNCTION  -->
+	
 	
 	<h3 id="sql_rank">Ranking items with a window function</h3>	
 	<p>This is a simple but practical example that can apply to tables of any size. Let's say we have food in a supermarket's inventory.</p>
@@ -66,8 +71,35 @@
 	<p>Indeed, we get the bananas and broccoli as expected. Where those rows tied on date, we got the one with the higher rating.</p>
 	<br>
 	
+	<!-- BASIC AGGREGATION -->
+	<h3 id="sql_sum">Basic Aggregation</h3>		
 	
-	
+	<p>Continuing with the food inventory example from above, I want to find the following:</p>
+	<ul>
+	<li>change the "meat" and "fish" labels to "protein"</li>
+	<li>find the average price of foods within the new categories</li>
+	<li>count the number of food items in each category</li>
+	</ul>	
+	<br>
+	<p>I'll first start with a case statement to rename the labels in a column "new_category", putting it side by side with "category" 
+	to confirm it's correct:</p>
+	<br>
+	<img src="sql_sum_case.PNG">
+	<br>
+	<br>
+	<p>That looks good. Now I'll use a CTE again to find the average and count values. 
+	I use the round function to get two decimal places.</p>
+	<br>
+	<img src="sql_sum_final.PNG">
+	<br>
+	<br>
+	<p>Great. I manually confirmed that the average price of fruit is 9.4875, which shows that the average and round functions work. 
+	Also we can easily see the counts of each category are correct.</p>
+	<br>
+	<p></p>
+	<p></p>
+	<p></p>
+	<p></p>
 	<!-- <h2>Python - getting data from a data warehouse</h2>	 -->
 	
 	
@@ -103,7 +135,7 @@
 	for file in bucket.objects.all():<br>
 	&nbsp;&nbsp;&nbsp;&nbsp;print(file)</p>	
 	<br>
-	<p>I'm editing in vim from an EMR cluster. I've been using vim for so long it's quite easy. Run the script:</p>
+	<p>I'm editing in vim from an EMR cluster. I've been using vim for a long time. Run the script:</p>
 	<br>
 	<p class="code">$ ./count_bucket_items.py<br>
 	s3.ObjectSummary(bucket_name='test', key='MovieSimilarities1M.jar')<br>
@@ -112,7 +144,7 @@
 	s3.ObjectSummary(bucket_name='test', key='fruits.csv')<br>
 	s3.ObjectSummary(bucket_name='test', key='music.csv')</p>
 	<br>
-	<p>This is a good start but note that it prints the folder, which we want to ignore. S3 doesn't have the concept of folders - it's just another object, in the same way that they don't have "files" either. It's all objects. Anyway we only want to consider actual "files".</p>
+	<p>This is a good start but note that it prints the folder, which we want to ignore. S3 doesn't have the concept of folders - it's just another object, in the same way that cloud platforms like AWS and Azure don't have "files" either. It's all objects. Anyway we only want to consider actual "files".</p>
 	<br>
 	<p>The script iterates through the returned list and does the following:</p>
 	<ul>
