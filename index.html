@@ -23,32 +23,36 @@
   <div class='container'>
 
 	<h2>Introduction</h2>
-	<p>Most of the projects I have worked are company-related and therefore proprietary. But here's a sample of awesome things I made.</p>
+	<p>Most of the projects I have worked on are company-related and therefore proprietary, but I can present use cases and examples. I also present data visualization and web projects from graduate coursework a few years ago.</p>
 
 	<h2>Code examples</h2>
 
-
 	<a href="#sql">SQL</a><br>
-	<a href="#python_aws">Python and boto3 - interacting with AWS S3</a><br>
-	<a href="#python_wb">Python, Pandas, and web development</a><br>
+	<span class="tab_1"><a href="#sql_rank">Ranking items with a window function</a><br>	
+	<a href="#python">Python</a><br>
+	<span class="tab_1"><a href="#python_aws_count">Counting objects in AWS S3</a><br>
+	<span class="tab_1"><a href="#python_wb">Pandas and web development project</a><br>
 	<a href="#data_viz">Data Vis</a>	
 
 	<h2 id="sql">SQL</h2>
 	
-	<p>This is a simple but real world example and can apply to tables of any size. This is a brief exercise that features food in a supermarket's storage. </p>
+	<h3 id="sql_rank">Ranking items with a window function</h3>	
+	<p>This is a simple but practical example that can apply to tables of any size. Let's say we have food in a supermarket's inventory.</p>
 
-	<p> <b>Objective</b>: Some of our food is old. We need to find the most recent foods so we can throw out the rest.<br><br>	
-	- Within each category, sort and find the most recent two foods by date.<br>
-	- if there's a tie on date, keep the one with a higher rating.<br>
-	- if there's a tie on rating, take the lower priced one.<br>
-	</p>
+	<p>Some of the food is old. We need to find the most recent foods so we can throw out the rest.</p>
+	<ul>
+	<li>within each category, sort and find the most recent two foods by date</li>
+	<li>if there's a tie on date, keep the one with a higher rating</li>
+	<li>if there's a tie on rating, take the lower priced one</li>
+	</ul>
+	
 	<br>
 	<p>Here's the inventory table. Note that we have some ties for date within fruits and veggies. How can we keep the ones highlighted in orange and ignore the gray?</p>
-	<img src="foods_full.PNG">
+	<img src="foods_full.png" alt="no image found!">
 	<br><br>
 	<p>The rank function can help us do that. I'll first show the table with the rank column so we can confirm the logic. For example with veggies, we get the most recent date and where there's a tie for second, we get the higher rated vegetable, which is broccoli. This is a DBeaver window, FYI.</p> 
 	<br>
-	<img src="rank_one.PNG">	
+	<img src="rank_one.png">	
 	<br><br><br>
 	<p>Now all we need to do is find where the rank value is 1 or 2. Most people would do this, a simple nested query:</p> 
 	<br><br>
@@ -68,14 +72,14 @@
 	
 	
 
-	<h2 id="python_aws">Python and boto3 - interacting with AWS S3</h2>		
+	<h2 id="python">Python</h2>		
 	
-	<h3>Counting objects in S3</h3>
-	<p>Let's say we have many objects in S3 and need to count how many there are based on the file extension. Here I test a script using this bucket as shown in the AWS Console:</p>
+	<h3 id="python_aws_count">Counting objects in AWS S3</h3>
+	<p>Let's say we have many objects in S3 and need to count how many there are based on the file extension. Here I test a script using this bucket, the contents of which are shown in the AWS Console:</p>
 	<br>
 	<img src="bucket_all.png">
 	<br><br>
-	<p>You could do the same with the AWS CLI command:</p>
+	<p>You could also see the contents using an AWS CLI command:</p>
 	<p class="code">$ aws s3 ls s3://test/<br>
 	<span class="tab_4">PRE empty_folder/<br>
 	2020-02-04 20:50:10    5759690 MovieSimilarities1M.jar<br>
@@ -85,16 +89,15 @@
 	</p>
 	<p></p>	
 	<br>
-	<p>This is all we need to get started. Import libraries, define the bucket name, and then see what's there.</p>		
+	<p>This is all we need to get started. boto3 is the library that allows Python to talk to S3. I also use "re" which is for regular expressions. It helps with 
+	doing search/replace and pattern matching text. All we need to do is import libraries, 
+	define the bucket name, and then see what objects AWS returns. </p>		
 	<br>
 	<p class="code">import boto3<br>
 	import re<br>
 	<br>
 	s3 = boto3.resource('s3')<br>
 	bucket = s3.Bucket('test')<br>
-	cnt = 0<br>
-	ext_dict = {}<br>
-	size = 0<br>
 	<br>
 	for file in bucket.objects.all():<br>
 	&nbsp;&nbsp;&nbsp;&nbsp;print(file)</p>	
@@ -110,6 +113,16 @@
 	<br>
 	<p>This is a good start but note that it prints the folder, which we want to ignore. S3 doesn't have the concept of folders - it's just another object, in the same way that they don't have "files" either. It's all objects. Anyway we only want to consider actual "files".</p>
 	<br>
+	<p>The script iterates through the returned list and does the following:</p>
+	<ul>
+	<li>ignore any value that ends with a slash / (indicates a folder)</li>
+	<li>look for anything with a pattern that has a dot, as in "file.ext", and the extention must have alphabetic characters</li>
+	<li>split on the dot "." to get the extension</li>
+	<li>increase the count if the extension exists in a dictionary, otherwise add it to the dictionary</li>
+	<li>add to overall count of objects</li>
+	<li>add to total size of all objects</li>
+	<li>print a summary of what was returned</li>
+	</ul>
 	<br>
 	<p class="code">for file in bucket.objects.all():<br>
 	<span class="tab_1">if not re.search("/$", file.key):     <br>
@@ -165,8 +178,8 @@
 	<br>
 	
 
-	<h2 id="python_wb">Python, Pandas, and web development</h2>
-	<h3>Exploring the World Bank API and development indicators</h3>	
+	<h3 id="python_wb">Pandas and web development project</h3>
+	<h4>Exploring the World Bank API and development indicators</h4>	
 	
 	<p>How effective is aid? Much has been written about the economic failures of Latin America in the 1970s and in Africa throughout the 1980s and 90s. Despite massive amounts of aid, many countries failed to achieve economic growth or quality of life improvements.</p>
 
@@ -174,7 +187,7 @@
 	
 	<p><a href="http://damp-waters-3821.herokuapp.com/">The Effectiveness of Foreign Aid</a></p>      		
 	
-	<p class='bold_text section'>Jupyter Notebook and Pandas Update</p>
+	<h4>Jupyter Notebook and Pandas Update</h4>
 	  
 	<p>The above website is still up but the Python code doesn't work because the World Bank changed their API. I just re-wrote the code using Jupyter Notebook and Pandas, which I had not yet known about back in 2015! </p>
 

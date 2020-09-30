@@ -66,3 +66,14 @@ table {
   padding-left: 160px;
 }
 
+
+ul {
+list-style-type: none;
+/* color:#999999; */
+}
+
+ul li:before {
+content: '\2014';
+position: absolute;
+margin-left: -20px;
+}
