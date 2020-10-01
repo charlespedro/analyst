@@ -12,10 +12,9 @@
 <body>
 <div class='header section'>
   <div class='container'>
-    <h1 id="top">Charles Pedro, Technical Data Analyst</h1>
-    <p>This is a portfolio that highlights some work I've done. It's in progress - more to come.</p>
-
-     
+    <h1 id="top">Charles Pedro</h1>
+	<h3>Technical Data Analyst</h3>
+    <p>This is a portfolio that highlights some work I've done. </p>
   </div>
 </div>
 <!--   <p></p>   -->
@@ -25,6 +24,7 @@
 	<h2>Introduction</h2>
 	<p>Most of the projects I have worked on are company-related and therefore proprietary, but I can present use cases and examples. I also present data visualization and web projects from graduate coursework a few years ago.</p>
 
+	<p>It's in progress - more to come.</p>
 	<h2>Code examples</h2>
 
 	<a href="#sql">SQL</a><br>
@@ -32,8 +32,9 @@
 	<span class="tab_1"><a href="#sql_sum">Basic Aggregation</a><br>		
 	<a href="#python">Python</a><br>
 	<span class="tab_1"><a href="#python_aws_count">Counting objects in AWS S3</a><br>
+	<span class="tab_1"><a href="#python_aws_text">Searching for text in S3 objects</a><br>	
 	<span class="tab_1"><a href="#python_wb">Pandas and web development project</a><br>
-	<a href="#data_viz">Data Vis</a>	
+	<a href="#data_viz">Data Visualization</a>	
 
 	<h2 id="sql">SQL</h2>
 	
@@ -211,6 +212,123 @@
 	<br>
 	
 
+
+	<h3 id="python_aws_text">Searching for text in S3 objects</h3>
+	<p>I was once asked to search for any objects in S3 that have a particular column name, among thousands of CSV and tab-delimited text files. This is an example of the solution.</p>
+	<p>If you recall from the previous example, there was a file called "countries.txt" in the S3 bucket. These are the contents:
+	<br>
+	<br>
+	<img src="s3_countries.PNG">
+	<br>
+	<br>
+	<p>In this example, the ask is to find any object in the bucket that has a column called "continent". Here is the approach:</p>
+	<br>
+	<ul>
+	<li>get a list of all objects in the bucket</li>
+	<li>iterate through the list and filter out anything that does not end in .csv or .txt</li>
+	<li>put together the request and send to S3; the important part is a kind of SQL statement to get just the first line of an object</li>
+	<li>iterate through the objects and save to a list any objects that match the text we want</li>
+	<li>print the objects and column names where the text match was found</li>
+	<li>I also included a "not_read" list if any files for some reason could not be read</li>
+	</ul>
+	<br>
+	<p class="code">import boto3<br>
+	import re<br>
+	import botocore.exceptions<br>
+	<br>
+	s3 = boto3.client('s3')<br>
+	bucket = "test"<br>
+	obj_list = []<br>
+	not_read = []<br>
+	text_match = {}<br>
+	cnt = 0<br>
+	<br>
+	<b># get a list of all objects in the bucket</b><br>
+	r = s3.list_objects_v2(Bucket=bucket)<br>
+	<br>
+	print("Starting here:\n")<br>
+	<br>
+	<b># filter for only objects ending in .csv or .txt, save to obj_list</b><br>
+	for x in r['Contents']:<br>
+	<span class="tab_1">for key, val in x.items():<br>
+	<span class="tab_2">if key == 'Key' and re.search(".*\.(csv|txt)+$", val):<br>
+				print(val)<br>
+				obj_list.append(val)<br>
+				cnt += 1<br>
+
+	print("\ntotal objects: ", cnt)<br>
+	<br>
+	<b># use a SQL-like statement, doing a "limit 1" because we only need to check the first line</b><br>
+	sql_stmt = """select * from s3object limit 1"""<br>
+	<br>
+	for obj in obj_list:<br>
+	<span class="tab_1">try:<br>
+	<span class="tab_2">req = s3.select_object_content(<br>
+	<span class="tab_2">Bucket=bucket,<br>
+	<span class="tab_2">Key=obj,<br>
+	<span class="tab_2">ExpressionType='SQL',<br>
+	<span class="tab_2">Expression=sql_stmt,<br>
+	<span class="tab_2"><b># 'FileHeaderInfo': 'NONE' is needed or else it would ignore the first line</b><br>
+	<span class="tab_2">InputSerialization = {'CSV': {'AllowQuotedRecordDelimiter':True, 'FileHeaderInfo': 'NONE'}},<br>
+	<span class="tab_2">OutputSerialization = {'CSV': {}})<br>
+	<span class="tab_1">except botocore.exceptions.ClientError:<br>
+	<span class="tab_2">not_read.append(obj)<br>
+	<span class="tab_1">else:<br>
+	<span class="tab_2">try:<br>
+	<span class="tab_3"><b># Payload has the first line of the file</b><br>
+	<span class="tab_3">for event in req['Payload']:<br>
+	<span class="tab_4">for key, val in event.items():<br>
+	<span class="tab_5">if key == 'Records':<br>
+	<span class="tab_6">first_line = val['Payload'].decode('utf-8')<br>
+	<span class="tab_6">match = re.findall(r"continent", first_line, re.IGNORECASE)<br>
+	<span class="tab_6">if match:<br>
+	<span class="tab_7">text_match[obj] = first_line <br>
+	<span class="tab_2">except botocore.exceptions.EventStreamError as error:<br>
+	<span class="tab_3">csv_unescaped.append(obj)<br>
+	<span class="tab_3">raise error<br>
+	<br>
+	if len(not_read) > 0:<br>
+	<span class="tab_1">print("**************** could not read these files!\n")<br>
+	<span class="tab_1">for x in not_read:<br>
+	<span class="tab_2">print(x)<br>
+	<br>
+	print("\n************************ found a match in this file!\n")<br>
+	for x, y in text_match.items():<br>
+	<span class="tab_1">print(x, y)<br>
+	<br>
+	print("\nScript end")<br>
+	</p>
+	<br>
+	<br>
+	<p>With all of that, run the script:</p>
+	<p class="code">$ ./s3_text_search.py<br>
+	Starting here:<br>
+	<br>
+	countries.txt<br>
+	fruits.csv<br>
+	music.csv<br>
+	<br>
+	total objects:  3<br>
+	<br>
+	************************ found a match in this file!<br>
+	<br>
+	countries.txt country   continent<br>
+	<br>
+	<br>
+	Script end</p>
+	<br>
+	<br>
+	<p>As expected, the script prints all .csv and .txt objects, the total count, and any matches, which in this case was the "countries.txt" object</p>
+	<br>
+	<br>
+	<p></p>
+	<p></p>
+	<p></p>	
+	<p></p>
+	<p></p>
+	<p></p>
+	<p></p>	
+	
 	<h3 id="python_wb">Pandas and web development project</h3>
 	<h4>Exploring the World Bank API and development indicators</h4>	
 	
