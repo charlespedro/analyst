@@ -326,7 +326,7 @@
 	<p></p>	
 	<p></p>
 	<h3 id="python_redshift">Redshift query results to Pandas dataframe</h3>
-	<p>A common task is to automate interactions with a database system, like executing a query or inserting tables. In this script I will connect to Redshift, save the results to a dataframe, and do a bunch of useful things operations.</p> 
+	<p>A common task is to automate interactions with a database system, like executing a query or inserting tables. In this script I will connect to Redshift, put a query result into a dataframe, and do a bunch of useful operations.</p> 
 	<!-- <ul> -->
 	<!-- <li>connect to Redshift</li> -->
 	<!-- <li>execute a select query</li>  -->
@@ -366,7 +366,7 @@
 	df = pd.DataFrame(data)<br>
 	</p>
 	<br>
-	<p>The above doesn't return the column names. So I used the direct Pandas method.</p>
+	<p>The above doesn't return the column names. So I used the Pandas method directly.</p>
 
 	<p>Anyway the code works and now I have the dataframe df. But there's one minor problem I noticed. In Spyder, I run df.info() and see that the "date" column is shown as an "object" type. This means it's a string, not a datetime object, which could be a problem if we want to perform any datetime operations.</p>
 	<br>
@@ -392,7 +392,7 @@
 	<img src="redshift_date_object_fixed.PNG">	
 	<br>
 	<br>
-	<p>And then to create a new column, let's first save the US-Canadian dollar rate to a variable. We might later automate retrieving the value from somewhere. Then just calculate to a new variable. You don't need to declare the variable beforehand. </p>
+	<p>And then to create a new column, let's first save the US-Canadian dollar exchange rate to a variable. We might later automate retrieving the value from somewhere. Then just calculate to a new variable. You don't need to declare the variable beforehand. </p>
 
 	<p class="code">cad_exch_rate = 1.33<br>
 
@@ -409,6 +409,7 @@
 	<br>
 	<br>
 	<img src="redshift_selected_columns.PNG">
+	<br>
 	<br>
 	<br>
 	<p>And finally, to save to a CSV:</p>
