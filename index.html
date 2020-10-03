@@ -34,6 +34,7 @@
 	<span class="tab_1"><a href="#python_aws_count">Counting objects in AWS S3</a><br>
 	<span class="tab_1"><a href="#python_aws_text">Searching for text in S3 objects</a><br>	
 	<span class="tab_1"><a href="#python_wb">Pandas and web development project</a><br>
+	<span class="tab_1"><a href="#python_redshift">Redshift query results to Pandas dataframe</a><br>	
 	<a href="#data_viz">Data Visualization</a>	
 
 	<h2 id="sql">SQL</h2>
@@ -134,7 +135,7 @@
 	bucket = s3.Bucket('test')<br>
 	<br>
 	for file in bucket.objects.all():<br>
-	&nbsp;&nbsp;&nbsp;&nbsp;print(file)</p>	
+	<span class="tab_4">print(file)</p>	
 	<br>
 	<p>I'm editing in vim from an EMR cluster. I've been using vim for a long time. Run the script:</p>
 	<br>
@@ -214,15 +215,14 @@
 
 
 	<h3 id="python_aws_text">Searching for text in S3 objects</h3>
-	<p>I was once asked to search for any objects in S3 that have a particular column name, among thousands of CSV and tab-delimited text files. This is an example of the solution.</p>
-	<p>If you recall from the previous example, there was a file called "countries.txt" in the S3 bucket. These are the contents:
+	<p>Let's say we need to search for any objects in S3 that have a particular column name, among thousands of CSV and tab-delimited text files. In this example, we need to find any column called "continent".</p>
+	<p>In my S3 bucket, it just so happens that there is an object called "countries.txt" which has these columns:</p> 
 	<br>
 	<br>
 	<img src="s3_countries.PNG">
 	<br>
 	<br>
-	<p>In this example, the ask is to find any object in the bucket that has a column called "continent". Here is the approach:</p>
-	<br>
+	<p>I have written a script with this approach:</p>
 	<ul>
 	<li>get a list of all objects in the bucket</li>
 	<li>iterate through the list and filter out anything that does not end in .csv or .txt</li>
@@ -318,16 +318,111 @@
 	Script end</p>
 	<br>
 	<br>
-	<p>As expected, the script prints all .csv and .txt objects, the total count, and any matches, which in this case was the "countries.txt" object</p>
+	<p>As expected, the script prints all .csv and .txt objects, the total count, and any matches, which in this case was the "countries.txt" object.</p>
 	<br>
 	<br>
 	<p></p>
 	<p></p>
 	<p></p>	
 	<p></p>
+	<h3 id="python_redshift">Redshift query results to Pandas dataframe</h3>
+	<p>A common task is to automate interactions with a database system, like executing a query or inserting tables. In this script I will connect to Redshift, save the results to a dataframe, and do a bunch of useful things operations.</p> 
+	<!-- <ul> -->
+	<!-- <li>connect to Redshift</li> -->
+	<!-- <li>execute a select query</li>  -->
+	<!-- <li>manipulate in a dataframe</li> -->
+	<!-- <li>write to a CSV file</li> -->
+	<!-- </ul> -->
+	<p>Again I use the foods table shown above. This script uses the psycopg2 library, a common one for talking to PostgreSQL databases.</p> 
+	<br>
+	<!-- <img src="s3_countries.PNG">	 -->
+	<p class="code">
+	import pandas as pd<br>
+	import psycopg2<br>
+	<br>
+	try:<br>
+	<span class="tab_1">connection=psycopg2.connect(dbname=database,<br>
+	<span class="tab_2">host = host,<br>
+	<span class="tab_2">port = port,<br>
+	<span class="tab_2">user = user,<br>
+	<span class="tab_2">password = passw)<br>
+	<span class="tab_1"><b># pass the results returned to a dataframe</b><br>
+	<span class="tab_1">df = pd.read_sql_query(query, connection)<br>
+	except Exception as error:<br>
+	<span class="tab_1">print("something went wrong!\n")<br>
+	<span class="tab_1">print(error)<br>
+	finally:<br>
+	<span class="tab_1"><b># closing database connection</b><br>
+	<span class="tab_1">if (connection):<br>
+	<span class="tab_2">connection.close()<br>
+	<span class="tab_2">print("PostgreSQL connection is closed\n")<br>
+	</p>
+	<br>
+	<p>You might notice that this doesn't handle the results in the usual way, like this:</p>
+	<p class="code">
+	cursor = connection.cursor()<br>
+	cursor.execute(query)<br>
+	data = np.array(cursor.fetchall())<br>
+	df = pd.DataFrame(data)<br>
+	</p>
+	<br>
+	<p>The above doesn't return the column names. So I used the direct Pandas method.</p>
+
+	<p>Anyway the code works and now I have the dataframe df. But there's one minor problem I noticed. In Spyder, I run df.info() and see that the "date" column is shown as an "object" type. This means it's a string, not a datetime object, which could be a problem if we want to perform any datetime operations.</p>
+	<br>
+	<img src="redshift_date_object.PNG">
+	<br>
+	<br>
+	<p>There are few more things I want to do, so in total:</p>
+	
+	<ul>
+	<li>change date string to datetime object</li>
+	<li>create a new price column that has the price in Canadian dollars</li>
+	<li>verify by selecting only certain columns</li>
+	<li>write to a CSV file</li> 
+	</ul>
+	<br>
 	<p></p>
-	<p></p>
-	<p></p>	
+	<p>Pandas is great. Converting the date field is as easy as:</p>
+	<br>
+	<p class="code">df['date'] = pd.to_datetime(df['date'])</p>
+	<br>
+	<p>This looks better:</p>
+	<br>
+	<img src="redshift_date_object_fixed.PNG">	
+	<br>
+	<br>
+	<p>And then to create a new column, let's first save the US-Canadian dollar rate to a variable. We might later automate retrieving the value from somewhere. Then just calculate to a new variable. You don't need to declare the variable beforehand. </p>
+
+	<p class="code">cad_exch_rate = 1.33<br>
+
+	df['price_CAD'] = df['price']*cad_exch_rate<br>
+	</p>
+	<br>
+	<p>Now let's see the whole dataframe, but I only need to see the category, name, price, and price_CAD columns. There are several ways to do that. These all do the same thing:</p>
+	<br>
+	<p class="code">
+	df[['category', 'name', 'price', 'price_CAD']]<br>
+	df.loc[0:,['category', 'name', 'price', 'price_CAD']]<br>
+	df.iloc[0:,[0,1,4,5]]<br>
+	</p>
+	<br>
+	<br>
+	<img src="redshift_selected_columns.PNG">
+	<br>
+	<br>
+	<p>And finally, to save to a CSV:</p>
+	<p class="code">df.to_csv('food_prices.csv', index=False)</p>
+	<br>
+	<br>
+	<br>
+	
+	
+	
+	
+	
+	
+	
 	
 	<h3 id="python_wb">Pandas and web development project</h3>
 	<h4>Exploring the World Bank API and development indicators</h4>	
