@@ -212,7 +212,7 @@
 	Finished extension count</p>
 	<br>
 	
-
+	<!------------------- Searching for text in S3 ----------------------->
 
 	<h3 id="python_aws_text">Searching for text in S3 objects</h3>
 	<p>Let's say we need to search for any objects in S3 that have a particular column name, among thousands of CSV and tab-delimited text files. In this example, we need to find any column called "continent".</p>
@@ -252,10 +252,10 @@
 	for x in r['Contents']:<br>
 	<span class="tab_1">for key, val in x.items():<br>
 	<span class="tab_2">if key == 'Key' and re.search(".*\.(csv|txt)+$", val):<br>
-				print(val)<br>
-				obj_list.append(val)<br>
-				cnt += 1<br>
-
+	<span class="tab_3">print(val)<br>
+	<span class="tab_3">obj_list.append(val)<br>
+	<span class="tab_3">cnt += 1<br>
+	<br>
 	print("\ntotal objects: ", cnt)<br>
 	<br>
 	<b># use a SQL-like statement, doing a "limit 1" because we only need to check the first line</b><br>
@@ -327,12 +327,7 @@
 	<p></p>
 	<h3 id="python_redshift">Redshift query results to Pandas dataframe</h3>
 	<p>A common task is to automate interactions with a database system, like executing a query or inserting tables. In this script I will connect to Redshift, put a query result into a dataframe, and do a bunch of useful operations.</p> 
-	<!-- <ul> -->
-	<!-- <li>connect to Redshift</li> -->
-	<!-- <li>execute a select query</li>  -->
-	<!-- <li>manipulate in a dataframe</li> -->
-	<!-- <li>write to a CSV file</li> -->
-	<!-- </ul> -->
+
 	<p>Again I use the foods table shown above. This script uses the psycopg2 library, a common one for talking to PostgreSQL databases.</p> 
 	<br>
 	<!-- <img src="s3_countries.PNG">	 -->
@@ -383,7 +378,7 @@
 	</ul>
 	<br>
 	<p></p>
-	<p>Pandas is great. Converting the date field is as easy as:</p>
+	<p>Converting the date field is as easy as:</p>
 	<br>
 	<p class="code">df['date'] = pd.to_datetime(df['date'])</p>
 	<br>
@@ -392,14 +387,14 @@
 	<img src="redshift_date_object_fixed.PNG">	
 	<br>
 	<br>
-	<p>And then to create a new column, let's first save the US-Canadian dollar exchange rate to a variable. We might later automate retrieving the value from somewhere. Then just calculate to a new variable. You don't need to declare the variable beforehand. </p>
+	<p>And then to create a new column, let's first assign the US-Canadian dollar exchange rate to a variable. We might later automate retrieving the value from somewhere. Then just declare the new column into existence. You don't need to declare the column beforehand. </p>
 
 	<p class="code">cad_exch_rate = 1.33<br>
 
 	df['price_CAD'] = df['price']*cad_exch_rate<br>
 	</p>
 	<br>
-	<p>Now let's see the whole dataframe, but I only need to see the category, name, price, and price_CAD columns. There are several ways to do that. These all do the same thing:</p>
+	<p>Now let's see the whole dataframe, but I only want to see the category, name, price, and price_CAD columns. There are several ways to do that. These all do the same thing:</p>
 	<br>
 	<p class="code">
 	df[['category', 'name', 'price', 'price_CAD']]<br>
@@ -416,14 +411,14 @@
 	<p class="code">df.to_csv('food_prices.csv', index=False)</p>
 	<br>
 	<br>
+	<p>I set index fo False because I don't see that in CSV. Looks good. </p>
 	<br>
+	<br>	
+	<br>
+	<br>
+
 	
-	
-	
-	
-	
-	
-	
+	<!------------------ Pandas and web development project ----------------------------->
 	
 	<h3 id="python_wb">Pandas and web development project</h3>
 	<h4>Exploring the World Bank API and development indicators</h4>	
