@@ -35,7 +35,11 @@
 	<span class="tab_1"><a href="#python_aws_text">Searching for text in S3 objects</a><br>	
 	<span class="tab_1"><a href="#python_redshift">Redshift query results to Pandas dataframe</a><br>	
 	<span class="tab_1"><a href="#python_wb">Pandas and web development project</a><br>	
-	<a href="#data_viz">Data Visualization</a>	
+	<a href="#data_viz">Data Visualization</a><br>	
+	<a href="#machine">Machine Learning</a>	
+
+
+
 
 	<h2 id="sql">SQL</h2>
 	
@@ -44,7 +48,7 @@
 	
 	
 	<h3 id="sql_rank">Ranking items with a window function</h3>	
-	<p>This is a simple but practical example that can apply to tables of any reasonable size (I haven't tried on a table with a billion rows using Hive). Let's say we have food in a supermarket's inventory. I'm using DBeaver to access the table in AWS Redshift, FYI.</p>
+	<p>This is a simple but practical example that can apply to tables of any reasonable size (I haven't tried on a table with a billion rows using Hive). Let's say we have food in a supermarket's inventory. I'm using DBeaver to access the table in AWS Redshift.</p>
 
 	<p>Some of the food is old. We need to find the most recent foods so we can throw out the rest.</p>
 	<ul>
@@ -411,7 +415,7 @@
 	<p class="code">df.to_csv('food_prices.csv', index=False)</p>
 	<br>
 	<br>
-	<p>I set index fo False because I don't see that in CSV. Looks good. </p>
+	<p>I set index fo False because I don't need that in CSV. Looks good. </p>
 	<br>
 	<br>	
 	<br>
@@ -436,6 +440,10 @@
 	<p><a href="https://github.com/charlespedro/worldbank/blob/master/world_bank.ipynb">Jupyter Notebook dataframe - calculations and aggregation</a></p> 
 	
 	<br>
+	
+	
+	<!------------------ Data Viz ----------------------------->	
+	
 	<h2 id="data_viz">Data Visualization</h2>
 	<h3>Data Visualization final project</h3>
 	<p>These are various visualizations creating using R, High Charts, Google Charts, and Tableau. The topics include health, education, economy, demographics, and other social indicators.</p>
@@ -447,12 +455,72 @@
 	<p><a href="http://charlespedro.github.io/data-viz-2-final/">Advanced Data Visualization Final Project</a></p>  	
 	
 	<br>
+	
+	<!------------------ machine learning ----------------------------->	
+	
+	<h2 id="machine">Machine Learning</h2>
+	<h3>Data Mining Project</h3>
+	<p>This is a data mining project I did to measure educational outcomes. The goal was to measure which are the most influential variables 
+	that lead to an increase in test scores for high school students in a one year period.</p>
+	<br>
+	<p>In particular, the target variable is the change in test scores between the beginning of a school year and at the end. </p>
+	<p></p>
+	<ul>
+	<li>2,133 rows; each row is a student</li>
+	<li>No missing data</li>
+	<li>11 variables</li>
+	</ul>
+	
+	<p>Here is a description of the predictor variables:</p>
+	<ul>
+	<li>School setting: urban, suburban, rural</li>
+	<li>School type: public, private</li>
+	<li>Teaching method: traditional, experimental</li>
+	<li>n_students: number of students in a class</li>	
+	<li>Gender: male, female (was found not to be influential in the model so it was removed)</li>		
+	<li>Lunch: free, not free (this can be considered a proxy for low-income students)</li>	
+	<li>Pre-test score</li>
+	</ul>	
+		
+	<p>The modeling was done using SPSS Modeler. It's a visual programming application which doesn't require actual code. Logistic regression was used. SPSS allows
+	you to run several kinds of algorithms all at once and compare the results. Logistic was found to yield the best results. </p>
+	
+	<h4>Key Findings</h4>
+	<ul>
+	<li>Teaching method - traditional vs. experimental - had the biggest influence on test scores</li>
+	<li>Free Lunch and n_students have a notable influence</li>
+	<li>School setting (subrban) had a small influence</li>
+	<li>These variables are <i><b>statistically significant</b></i> according to the model</li>	
+	</ul>	
+	<br>
+	<p>This is what the SPSS window looks like.</p>
+	<p><img src="spss.PNG" alt="no image found!"></p>
+	<br>
+	<p>For more information about the project, please see the video presentation:</p>
+
+	<p><a href="https://youtu.be/dDGIjpr3kLw">Data Mining Presentation - 15 minute video</a></p> 	
+	
+	<p></p>
+	
 	<br>
 	<a href="#top">Back to top</a><br>
 	<br>
 	<br>
   </div>
 </div>    
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
    
     
 </body>
