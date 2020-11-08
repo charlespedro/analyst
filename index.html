@@ -141,7 +141,7 @@
 	for file in bucket.objects.all():<br>
 	<span class="tab_4">print(file)</p>	
 	<br>
-	<p>I'm editing in vim from an EMR cluster. I've been using vim for a long time. Run the script:</p>
+	<p>I'm editing in vim from an EMR cluster. Run the script:</p>
 	<br>
 	<p class="code">$ ./count_bucket_items.py<br>
 	s3.ObjectSummary(bucket_name='test', key='MovieSimilarities1M.jar')<br>
@@ -150,7 +150,7 @@
 	s3.ObjectSummary(bucket_name='test', key='fruits.csv')<br>
 	s3.ObjectSummary(bucket_name='test', key='music.csv')</p>
 	<br>
-	<p>This is a good start but note that it prints the folder, which we want to ignore. S3 doesn't have the concept of folders - it's just another object, in the same way that cloud platforms like AWS and Azure don't have "files" either. It's all objects. Anyway we only want to consider actual "files".</p>
+	<p>This is a good start but note that it prints the folder, which we want to ignore. S3 doesn't have the concept of folders - it's just another object. Anyway we only want to consider actual "files".</p>
 	<br>
 	<p>This script will iterate through the returned list and do the following:</p>
 	<ul>
@@ -398,7 +398,7 @@
 	df['price_CAD'] = df['price']*cad_exch_rate<br>
 	</p>
 	<br>
-	<p>Now let's see the whole dataframe, but I only want to see the category, name, price, and price_CAD columns. There are several ways to do that. These all do the same thing:</p>
+	<p>Now let's verify by selecting only the category, name, price, and price_CAD columns. There are several ways to do that. These all do the same thing:</p>
 	<br>
 	<p class="code">
 	df[['category', 'name', 'price', 'price_CAD']]<br>
@@ -415,7 +415,7 @@
 	<p class="code">df.to_csv('food_prices.csv', index=False)</p>
 	<br>
 	<br>
-	<p>I set index fo False because I don't need that in CSV. Looks good. </p>
+	<p>I set index fo False because I don't need that in the CSV. Looks good. </p>
 	<br>
 	<br>	
 	<br>
